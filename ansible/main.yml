@@ -6,6 +6,14 @@
   vars_files:
     - config.yml
 
+  vars:
+    pip_install_packages:
+      - name: docker
+
+  roles:
+    - geerlingguy.pip
+    - geerlingguy.docker
+
   tasks:
     - name: Update apt cache.
       ansible.builtin.apt:

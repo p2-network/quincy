@@ -39,4 +39,5 @@ jobs:
         with:
           playbook: main.yml
           directory: ./ansible
+          requirements: requirements.yml
           # vault_password: ${{secrets.VAULT_PASSWORD}}
