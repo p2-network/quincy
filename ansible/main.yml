@@ -1,0 +1,12 @@
+---
+- hosts: all
+  become: true
+  gather_facts: true
+
+  vars_files:
+    - config.yml
+
+  tasks:
+    - name: Update apt cache.
+      ansible.builtin.apt:
+        update_cache: yes

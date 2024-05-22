@@ -39,18 +39,9 @@ jobs:
         run: |
           ssh ${{ vars.TARGET_USER }}@${{ vars.TARGET_HOSTNAME }} "uname -a"
 
-      # - name: Run playbook
-      #   uses: dawidd6/action-ansible-playbook@v2
-      #   with:
-      #     playbook: main.yml
-      #     directory: ./ansible
-      #     # vault_password: ${{secrets.VAULT_PASSWORD}}
-
-      # # TODO: something like:
-      # # ssh patrick@nyx.tuatara-puffin.ts.net "if [ ! -d /opt/gitops/nyx ]; then mkdir /opt/gitops && git clone https://github.com/p2-network/nyx /opt/gitops/nyx; fi"
-      # # but... permissions.
-      
-      # - name: Remote Deployment
-      #   shell: bash
-      #   run: |
-      #     ssh ${{ vars.TARGET_USER }}@${{ vars.TARGET_HOSTNAME }} "cd /opt/gitops/nyx && git pull && ci/update.sh"
+      - name: Run playbook
+        uses: dawidd6/action-ansible-playbook@v2
+        with:
+          playbook: main.yml
+          directory: ./ansible
+          # vault_password: ${{secrets.VAULT_PASSWORD}}
