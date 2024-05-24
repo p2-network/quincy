@@ -18,3 +18,13 @@
     - name: Update apt cache.
       ansible.builtin.apt:
         update_cache: yes
+
+    - name: Create a test direcotry
+      ansible.builtin.file:
+        path: /opt/p2-network/test/
+        state: directory
+
+    - name: Create a test file
+      ansible.builtin.template:
+        src: templates/test.j2
+        dest: /opt/p2-network/test/test.txt
