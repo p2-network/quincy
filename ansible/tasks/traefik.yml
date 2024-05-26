@@ -1,0 +1,47 @@
+---
+- name: Create a directory for traefik
+  ansible.builtin.file:
+    path: /opt/p2-network/traefik
+    state: directory
+
+- name: Create a directory for traefik/acme
+  ansible.builtin.file:
+    path: /opt/p2-network/traefik/acme
+    state: directory
+
+- name: Create a directory for traefik/traefik
+  ansible.builtin.file:
+    path: /opt/p2-network/traefik/traefik
+    state: directory
+
+- name: Write traefik/middlewares.yml
+  ansible.builtin.copy:
+    src: files/traefik/middlewares.yml
+    dest: /opt/p2-network/traefik/traefik/middlewares.yml
+  # TODO: add a handler to restart traefik
+
+- name: Write traefik/tls.yml
+  ansible.builtin.copy:
+    src: files/traefik/tls.yml
+    dest: /opt/p2-network/traefik/traefik/tls.yml
+  # TODO: add a handler to restart traefik
+
+- name: Write traefik/docker-compose.yml
+  ansible.builtin.template:
+    src: templates/traefik/docker-compose.yml
+    dest: /opt/p2-network/traefik/docker-compose.yml
+
+- name: Write traefik-acme/acme_email
+  ansible.builtin.copy:
+    content: "{{ traefik_acme_email }}"
+    dest: /opt/p2-network/traefik/acme_email
+  # TODO: add a handler to restart traefik
+
+- name: Create and start traefik
+  community.docker.docker_compose_v2:
+    project_src: /opt/p2-network/traefik/
+  register: output
+
+# - name: Show results
+#   ansible.builtin.debug:
+#     var: output
