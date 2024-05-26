@@ -26,9 +26,7 @@ services:
       - "--providers.file.watch=true"
 
       - "--entrypoints.web.address=:80"
-      # - "--entryPoints.web.forwardedHeaders.trustedIPs=172.19.0.0/16"
       - "--entrypoints.websecure.address=:443"
-      # - "--entryPoints.websecure.forwardedHeaders.trustedIPs=172.19.0.0/16"
 
       - "--certificatesresolvers.route53.acme.storage=/etc/traefik-acme/route53.json"
       - "--certificatesresolvers.route53.acme.dnschallenge.provider=route53"
@@ -49,7 +47,6 @@ services:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - ./traefik/:/etc/traefik/
       - ./acme/:/etc/traefik-acme/
-      # - "/opt/p2-network/run/DOCKER_TRAEFIK_AWS_SHARED_CREDENTIALS_FILE:/etc/traefik-aws-credentials"
     environment:
       - TZ=Australia/Melbourne
       - AWS_REGION=ap-southeast-2
@@ -63,7 +60,7 @@ services:
 
 networks:
   per_docker_roles:
-    name: {{ per_docker_roles_network.network.Name }}
+    name: "{{ per_docker_roles_network.network.Name }}"
     external: true
 
 secrets:
