@@ -29,3 +29,6 @@
 
     - name: Configure Per Docker Roles service
       include_tasks: tasks/per-docker-roles.yml
+
+    - name: Deploy Traefik
+      include_tasks: tasks/traefik.yml
