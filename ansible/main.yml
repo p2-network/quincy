@@ -24,7 +24,8 @@
         path: /opt/p2-network/test/
         state: directory
 
-    - name: Create a test file
-      ansible.builtin.template:
-        src: templates/test.j2
-        dest: /opt/p2-network/test/test.txt
+    - name: Configure AWS IAM Roles Anywhere service
+      include_tasks: tasks/aws-iam-roles-anywhere.yml
+
+    - name: Configure Per Docker Roles service
+      include_tasks: tasks/per-docker-roles.yml

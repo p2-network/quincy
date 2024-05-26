@@ -1,0 +1,83 @@
+---
+
+  # 208  sudo apt install opensc-pkcs11
+  # 214  lsusb
+  # 215  p11-kit 
+  # 216  p11-kit list-modules
+  # 217  pkcs11-tool --login --test
+  # 218  sudo apt install pkcs11-tool
+  # 219  pkcheck 
+  # 222  sudo apt-get install opensc
+
+- name: Install opensc
+  ansible.builtin.apt:
+    name: opensc
+    state: present
+
+- name: Install opensc-pkcs11
+  ansible.builtin.apt:
+    name: opensc-pkcs11
+    state: present
+
+- name: Install p11-kit
+  ansible.builtin.apt:
+    name: p11-kit
+    state: present
+
+- name: Create a directory for rolesanywhere-credential-helper
+  ansible.builtin.file:
+    path: /opt/p2-network/rolesanywhere-credential-helper/{{ rolesanywhere_credential_helper_version }}
+    state: directory
+
+- name: Pull rolesanywhere_credential_helper from docker
+  ansible.builtin.shell: |
+    cd /opt/p2-network/rolesanywhere-credential-helper/{{ rolesanywhere_credential_helper_version }}
+
+    image_name=ghcr.io/thepatrick/rolesanywhere-credential-helper:{{ rolesanywhere_credential_helper_version }}
+
+    id=$(docker create $image_name)
+
+    echo "Copying file from docker container ($id, from $image_name) to local file $local_file_name"
+
+    docker cp $id:/aws_signing_helper - > aws_signing_helper.tar
+    docker rm -v $id
+
+    tar xf aws_signing_helper.tar
+
+    rm aws_signing_helper.tar
+  args:
+    creates: /opt/p2-network/rolesanywhere-credential-helper/{{ rolesanywhere_credential_helper_version }}/aws_signing_helper
+
+  # TODO: remove all other entries in /opt/p2-network/rolesanywhere-credential-helper/
+    
+- name: Add the user 'aws-signing-helper'
+  ansible.builtin.user:
+    name: aws-signing-helper
+    shell: /bin/bash
+    # groups: admins,developers
+    # append: yes
+
+- name: Create rolesanywhere-credential-helper script
+  ansible.builtin.template:
+    src: templates/aws-iam-roles-anywhere/rolesanywhere-credential-helper.j2
+    dest: /opt/p2-network/rolesanywhere-credential-helper/rolesanywhere-credential-helper
+    mode: 0700
+    owner: aws-signing-helper
+  vars:
+    binary: /opt/p2-network/rolesanywhere-credential-helper/{{ rolesanywhere_credential_helper_version }}/aws_signing_helper
+    user: aws-signing-helper
+
+- name: Create systemd unit for aws-signing-helper
+  ansible.builtin.template:
+    src: templates/aws-iam-roles-anywhere/aws-signing-helper.service.j2
+    dest: /etc/systemd/system/aws-signing-helper.service
+  vars:
+    binary: /opt/p2-network/rolesanywhere-credential-helper/{{ rolesanywhere_credential_helper_version }}/aws_signing_helper
+    user: aws-signing-helper
+
+- name: Start aws-signing-helper service
+  ansible.builtin.systemd_service:
+    name: aws-signing-helper
+    state: started
+    enabled: yes
+    daemon_reload: yes
