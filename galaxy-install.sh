@@ -2,4 +2,4 @@
 
 cd "$(dirname "$0")"/ansible
 
-ansible-galaxy install --roles-path `pwd`/roles -r requirements.yml
+ansible-galaxy install --roles-path `pwd`/roles -r requirements.yml --force

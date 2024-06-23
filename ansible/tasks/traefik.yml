@@ -15,10 +15,14 @@
     state: directory
 
 - name: Write traefik/middlewares.yml
-  ansible.builtin.copy:
-    src: files/traefik/middlewares.yml
-    dest: /opt/p2-network/traefik/traefik/middlewares.yml
-  # TODO: add a handler to restart traefik
+  ansible.builtin.file:
+    path: /opt/p2-network/traefik/traefik/middlewares.yml
+    state: absent
+
+  # ansible.builtin.copy:
+  #   src: files/traefik/middlewares.yml
+  #   dest: /opt/p2-network/traefik/traefik/middlewares.yml
+  # # TODO: add a handler to restart traefik
 
 - name: Write traefik/tls.yml
   ansible.builtin.copy:

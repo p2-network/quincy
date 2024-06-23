@@ -7,10 +7,10 @@ services:
     container_name: "traefik"
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.api-tailscale.rule=Host(`traefik.quincy.thepatrick.cloud`) && (ClientIP(`100.0.0.0/8`) || ClientIP(`fd7a:115c:a1e0:ab12::/64`))"
+      - "traefik.http.routers.api-tailscale.rule=Host(`traefik.quincy.thepatrick.cloud`)"
       - "traefik.http.routers.api-tailscale.entrypoints=websecure"
       - "traefik.http.routers.api-tailscale.service=api@internal"
-      - "traefik.http.routers.api-tailscale.tls=true"
+      # - "traefik.http.routers.api-tailscale.tls=true"
       - "traefik.http.routers.api-tailscale.tls.certresolver=route53"
       - "traefik.http.routers.api-tailscale.tls.domains[0].main=*.quincy.thepatrick.cloud"
       - "per-container-role=arn:aws:iam::749916541518:role/anywhere/unicorn/quincy/quincy-traefik20240526073635461300000001"
@@ -31,9 +31,6 @@ services:
       - "--certificatesresolvers.route53.acme.storage=/etc/traefik-acme/route53.json"
       - "--certificatesresolvers.route53.acme.dnschallenge.provider=route53"
       - "--certificatesresolvers.route53.acme.dnschallenge.delaybeforecheck=0"
-
-      - "--experimental.plugins.real-ip.moduleName=github.com/Paxxs/traefik-get-real-ip"
-      - "--experimental.plugins.real-ip.version=v1.0.2"
     ports:
       - target: 80
         published: 80
