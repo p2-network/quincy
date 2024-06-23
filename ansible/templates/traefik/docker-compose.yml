@@ -2,12 +2,12 @@ version: "3.3"
 
 services:
   traefik:
-    image: "traefik:v2.11.3"
+    image: "traefik:v3.0.1"
     restart: unless-stopped
     container_name: "traefik"
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.api-tailscale.rule=Host(`traefik.quincy.thepatrick.cloud`) && ClientIP(`100.0.0.0/8`, `fd7a:115c:a1e0:ab12::/64`)"
+      - "traefik.http.routers.api-tailscale.rule=Host(`traefik.quincy.thepatrick.cloud`) && (ClientIP(`100.0.0.0/8`) || ClientIP(`fd7a:115c:a1e0:ab12::/64`))"
       - "traefik.http.routers.api-tailscale.entrypoints=websecure"
       - "traefik.http.routers.api-tailscale.service=api@internal"
       - "traefik.http.routers.api-tailscale.tls=true"
