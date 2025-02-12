@@ -1,0 +1,30 @@
+---
+name: daikin-exporter
+
+services:
+  daikin-exporter:
+    image: ghcr.io/thepatrick/daikin-exporter:sha-d36a5bd
+    restart: unless-stopped
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.daikin-exporter.rule=Host(`{{ daikin_exporter_hostname }}`)'
+      - 'traefik.http.routers.daikin-exporter.entrypoints=websecure'
+      - 'traefik.http.routers.daikin-exporter.tls=true'
+      - 'traefik.http.routers.daikin-exporter.tls.certresolver=route53'
+      - 'traefik.http.routers.daikin-exporter.tls.domains[0].main={{ traefik_default_certificate }}'
+
+    networks:
+      default:
+      traefik:
+    expose:
+      - 3000
+    ports:
+      - "3000:3000"
+    env_file:
+      - daikin-exporter.env
+
+networks:
+  traefik:
+    name: traefik_default
+    external: true
+    

@@ -32,7 +32,7 @@ jobs:
       - name: Adding known host
         shell: bash
         run: |
-          ssh-keyscan -p 22 "${{ vars.TARGET_HOSTNAME }}" >> ~/.ssh/known_hosts
+          ssh-keyscan -p 22 "teagan.tuatara-puffin.ts.net" >> ~/.ssh/known_hosts
 
       - name: Run playbook
         uses: dawidd6/action-ansible-playbook@v2
@@ -41,3 +41,5 @@ jobs:
           directory: ./ansible
           requirements: requirements.yml
           vault_password: ${{secrets.VAULT_PASSWORD_QUINCY}}
+          options: |
+            --limit github

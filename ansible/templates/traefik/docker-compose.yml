@@ -1,5 +1,3 @@
-version: "3.3"
-
 services:
   traefik:
     image: "traefik:v3.0.1"
@@ -7,13 +5,13 @@ services:
     container_name: "traefik"
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.api-tailscale.rule=Host(`traefik.quincy.thepatrick.cloud`)"
+      - "traefik.http.routers.api-tailscale.rule=Host(`{{ traefik_api_host }}`)"
       - "traefik.http.routers.api-tailscale.entrypoints=websecure"
       - "traefik.http.routers.api-tailscale.service=api@internal"
       # - "traefik.http.routers.api-tailscale.tls=true"
       - "traefik.http.routers.api-tailscale.tls.certresolver=route53"
-      - "traefik.http.routers.api-tailscale.tls.domains[0].main=*.quincy.thepatrick.cloud"
-      - "per-container-role=arn:aws:iam::749916541518:role/anywhere/unicorn/quincy/quincy-traefik20240526073635461300000001"
+      - "traefik.http.routers.api-tailscale.tls.domains[0].main={{ traefik_default_certificate }}"
+      - "per-container-role={{ traefik_per_container_role }}"
     command:
       #- "--log.level=DEBUG"
       - "--api"

@@ -1,0 +1,42 @@
+---
+- name: Create a directory for Seafile
+  ansible.builtin.file:
+    path: /opt/seafile
+    state: directory
+
+- name: Create a directory for Seafile Data
+  ansible.builtin.file:
+    path: /opt/seafile/data
+    state: directory
+
+- name: Create a directory for Seafile DB Data
+  ansible.builtin.file:
+    path: /opt/seafile/database
+    state: directory
+
+- name: Create a directory for Seafile Elasticsearch Data
+  ansible.builtin.file:
+    path: /opt/seafile/elasticsearch
+    state: directory
+
+- name: Write seafile/.env
+  ansible.builtin.template:
+    src: templates/seafile/env
+    dest: /opt/seafile/.env
+  vars:
+    seafile_volume: /opt/seafile/data
+    seafile_mysql_volume: /opt/seafile/database
+    seafile_elasticsearch_volume: /opt/seafile/elasticsearch
+
+
+- name: Write seafile/seafile-server.yml
+  ansible.builtin.template:
+    src: templates/seafile/seafile-server.yml
+    dest: /opt/seafile/seafile-server.yml
+
+- name: Create and start seafile
+  community.docker.docker_compose_v2:
+    project_src: /opt/seafile/
+    files:
+      - seafile-server.yml
+  register: output

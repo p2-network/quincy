@@ -1,0 +1,41 @@
+---
+
+# docmost_app_url "http://localhost:3000"
+# docmost_app_secret "a long secret"
+# docmost_db_password "a long secret
+
+- name: Create a directory for Docmost  
+  ansible.builtin.file:
+    path: /opt/p2-network/docmost
+    state: directory
+
+- name: Create a directory for Docmost Storage
+  ansible.builtin.file:
+    path: /opt/p2-network/docmost/storage
+    state: directory
+    owner: patrick
+    group: patrick
+
+- name: Create a directory for Docmost Database
+  ansible.builtin.file:
+    path: /opt/p2-network/docmost/database
+    state: directory
+
+- name: Create a directory for Docmost Redis
+  ansible.builtin.file:
+    path: /opt/p2-network/docmost/redis
+    state: directory
+
+- name: Write docmost/docker-compose.yml
+  ansible.builtin.template:
+    src: templates/docmost/docker-compose.yml
+    dest: /opt/p2-network/docmost/docker-compose.yml
+  vars:
+    docmost_db_volume: /opt/p2-network/docmost/database
+    docmost_redis_volume: /opt/p2-network/docmost/redis
+    docmost_storage_volume: /opt/p2-network/docmost/storage
+
+- name: Create and start Docmost
+  community.docker.docker_compose_v2:
+    project_src: /opt/p2-network/docmost/
+  register: output

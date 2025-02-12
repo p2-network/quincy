@@ -1,4 +1,12 @@
-- src: geerlingguy.docker
-  version: 7.2.0
-- src: geerlingguy.pip
-  version: 3.0.3
+---
+roles:
+  - src: geerlingguy.docker
+    version: 7.2.0
+  - src: geerlingguy.pip
+    version: 3.0.3
+
+collections:
+  - name: ansible.posix
+    version: 2.0.0
+  - name: grafana.grafana
+    version: 5.7.0

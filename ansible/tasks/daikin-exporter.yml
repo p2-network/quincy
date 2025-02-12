@@ -1,0 +1,20 @@
+---
+- name: Create a directory for daikin-exporter
+  ansible.builtin.file:
+    path: /opt/p2-network/daikin-exporter
+    state: directory
+  
+- name: Write daikin-exporter/docker-compose.yml
+  ansible.builtin.template:
+    src: templates/daikin-exporter/docker-compose.yml
+    dest: /opt/p2-network/daikin-exporter/docker-compose.yml
+
+- name: Write daikin-exporter/daikin-exporter.env
+  ansible.builtin.template:
+    src: templates/daikin-exporter/env
+    dest: /opt/p2-network/daikin-exporter/daikin-exporter.env
+
+- name: Create and start daikin-exporter
+  community.docker.docker_compose_v2:
+    project_src: /opt/p2-network/daikin-exporter/
+  register: output

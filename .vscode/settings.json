@@ -1,0 +1,6 @@
+{
+  "yaml.schemas": {
+    "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/vars.json": "file:///Users/patrick/Developer/quincy/ansible/hosts.yml",
+    "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/ansible.json": "file:///Users/patrick/Developer/quincy/ansible/tasks/traefik.yml"
+  }
+}

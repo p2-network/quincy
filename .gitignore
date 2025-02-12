@@ -1,3 +1,4 @@
 *.env
 
 /ansible/roles/geerlingguy.*
+.DS_Store
