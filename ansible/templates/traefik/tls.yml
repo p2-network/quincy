@@ -4,4 +4,4 @@ tls:
       defaultGeneratedCert:
         resolver: "route53"
         domain:
-          main: "*.quincy.thepatrick.cloud"
+          main: "{{ traefik_default_certificate }}"

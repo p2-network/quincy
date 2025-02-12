@@ -1,0 +1,2 @@
+AC_IP={{ daikin_exporter_ac_ip }}
+AC_UUID={{ daikin_exporter_ac_uuid }}

@@ -1,0 +1,46 @@
+services:
+  docmost:
+    image: docmost/docmost:0.7.0
+    depends_on:
+      - db
+      - redis
+    environment:
+      APP_URL: 'https://{{ docmost_hostname }}'
+      APP_SECRET: '{{ docmost_app_secret }}'
+      DATABASE_URL: 'postgresql://docmost:{{ docmost_db_password }}@db:5432/docmost?schema=public'
+      REDIS_URL: 'redis://redis:6379'
+    # ports:
+    #   - "3000:3000"
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.docmost.rule=Host(`{{ docmost_hostname }}`)'
+      - 'traefik.http.routers.docmost.entrypoints=websecure'
+      - 'traefik.http.routers.docmost.tls=true'
+      - 'traefik.http.routers.docmost.tls.certresolver=route53'
+    networks:
+      default:
+      traefik:
+    restart: unless-stopped
+    volumes:
+      - {{ docmost_storage_volume }}:/app/data/storage
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: docmost
+      POSTGRES_USER: docmost
+      POSTGRES_PASSWORD: {{ docmost_db_password }}
+    restart: unless-stopped
+    volumes:
+      - {{ docmost_db_volume }}:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7.2-alpine
+    restart: unless-stopped
+    volumes:
+      - {{ docmost_redis_volume }}:/data
+
+networks:
+  traefik:
+    name: traefik_default
+    external: true
