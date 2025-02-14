@@ -372,6 +372,11 @@
       ansible.builtin.apt:
         update_cache: yes
 
+    - name: Install tmux
+      ansible.builtin.apt:
+        name: tmux
+        state: present
+
     - name: Create a test direcotry
       ansible.builtin.file:
         path: /opt/p2-network/test/
