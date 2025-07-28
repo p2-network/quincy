@@ -1,0 +1,45 @@
+---
+
+- name: Create User
+  ansible.builtin.user:
+    name: runner
+    shell: /bin/bash
+    create_home: true
+    
+- name: Add runner to docker group
+  ansible.builtin.user:
+    name: runner
+    groups: docker
+    append: yes    
+
+- name: Download forgejo-runner binary
+  ansible.builtin.get_url:
+    url: "https://code.forgejo.org/forgejo/runner/releases/download/v{{ forgejo_runner_version }}/forgejo-runner-{{ forgejo_runner_version }}-linux-arm64"
+    dest: /usr/local/bin/forgejo-runner
+    mode: '0755'
+    owner: runner
+    group: runner
+
+# * generate config `forgejo-runner generate-config > config.yml`
+
+- name: Create forgejo-runner configuration file
+  ansible.builtin.shell: |
+    sudo -u runner forgejo-runner register --no-interactive --token {{ forgejo_runner_token }} --instance {{ forgejo_instance_url }} --labels "docker:docker://data.forgejo.org/oci/node:20-bullseye,ubunutu:docker://ghcr.io/catthehacker/ubuntu:act-latest"
+  args:
+    chdir: /home/runner
+    creates: /home/runner/.runner
+
+- name: Create systemd unit for forgejo-runner
+  ansible.builtin.template:
+    src: templates/forgejo-runner/forgejo-runner.service.j2
+    dest: /etc/systemd/system/forgejo-runner.service
+  vars:
+    user: runner
+    binary: /usr/local/bin/forgejo-runner
+
+- name: Start forgejo-runner service
+  ansible.builtin.systemd_service:
+    name: forgejo-runner
+    state: started
+    enabled: yes
+    daemon_reload: yes
