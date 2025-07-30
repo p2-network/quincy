@@ -363,14 +363,19 @@
         state: present
       when: set_vm_max_map_count is defined
 
+    - name: Update apt cache.
+      ansible.builtin.apt:
+        update_cache: yes
+
     - name: Install htop
       ansible.builtin.package:
         name: htop
         state: present
 
-    - name: Update apt cache.
-      ansible.builtin.apt:
-        update_cache: yes
+    - name: Install jq
+      ansible.builtin.package:
+        name: jq
+        state: present
 
     - name: Install tmux
       ansible.builtin.apt:
@@ -389,6 +394,10 @@
     - name: Configure Per Docker Roles service
       include_tasks: tasks/per-docker-roles.yml
       when: rolesanywhere_profile_arn is defined
+
+    - name: Deploy forgejo-runner
+      include_tasks: tasks/forgejo-runner.yml
+      when: wants_forgejo_runner is true
 
     - name: Deploy Traefik
       include_tasks: tasks/traefik.yml
