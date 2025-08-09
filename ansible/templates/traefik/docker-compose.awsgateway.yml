@@ -1,0 +1,108 @@
+services:
+  traefik:
+    image: "traefik:v3.3.3"
+    restart: unless-stopped
+    container_name: "traefik"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.api-tailscale.rule=Host(`{{ traefik_api_host }}`)"
+      - "traefik.http.routers.api-tailscale.entrypoints=websecure"
+      - "traefik.http.routers.api-tailscale.service=api@internal"
+      # - "traefik.http.routers.api-tailscale.tls=true"
+      - "traefik.http.routers.api-tailscale.tls.certresolver=route53"
+      - "traefik.http.routers.api-tailscale.tls.domains[0].main={{ traefik_default_certificate }}"
+      # - "per-container-role=was a var: traefik_per_container_role
+
+    command:
+      - "--log.level=DEBUG"
+      - "--api"
+
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.network=traefik_default"
+
+      - "--providers.file.directory=/etc/traefik/"
+      - "--providers.file.watch=true"
+
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+
+      - "--certificatesresolvers.route53.acme.storage=/etc/traefik-acme/route53.json"
+      - "--certificatesresolvers.route53.acme.dnschallenge.provider=route53"
+      - "--certificatesresolvers.route53.acme.dnschallenge.delaybeforecheck=0"
+
+      - "--log.filePath=/var/log/traefik/traefik.log"
+      # - "--log.level=DEBUG"
+      - "--log.maxage=30"
+      - "--log.compress=true"
+
+      - "--accesslog=true"
+      - "--accesslog.filepath=/var/log/traefik/access.log"
+      # - "--accesslog.bufferingsize=100"
+
+{% if traefik_crowdsec_enabled %}
+      - "--experimental.plugins.bouncer.modulename=github.com/maxlerebourg/crowdsec-bouncer-traefik-plugin"
+      - "--experimental.plugins.bouncer.version=v1.4.4"
+{% endif %}
+
+    ports:
+      - target: 80
+        published: 80
+        protocol: tcp
+        mode: host
+      - target: 443
+        published: 443
+        protocol: tcp
+        mode: host
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - ./traefik/:/etc/traefik/
+      - ./acme/:/etc/traefik-acme/
+      - ./logs/:/var/log/traefik/
+    environment:
+      - TZ=Australia/Melbourne
+      - AWS_REGION=ap-southeast-2
+      - TRAEFIK_CERTIFICATESRESOLVERS_route53_ACME_EMAIL_FILE=/run/secrets/acme_email
+    secrets:
+      - acme_email
+    networks:
+      - default
+
+  whoami1:
+    image: traefik/whoami
+    container_name: "simple-service-foo"
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      # Definition of the router
+      - "traefik.http.routers.router-foo.rule=Host(`echo.gw3-apse2c.thepatrick.cloud`)"
+
+      - "traefik.http.routers.router-foo.tls.certresolver=route53"
+      - "traefik.http.routers.router-foo.tls.domains[0].main={{ traefik_default_certificate }}"
+
+      - "traefik.http.routers.router-foo.entrypoints=websecure"
+
+      - "traefik.http.services.service-foo.loadbalancer.server.port=80"
+
+{% if traefik_crowdsec_enabled %}
+      - "traefik.http.routers.router-foo.middlewares=crowdsec@docker" 
+
+      - "traefik.http.middlewares.crowdsec.plugin.bouncer.enabled=true"
+      - "traefik.http.middlewares.crowdsec.plugin.bouncer.crowdseclapikey={{ traefik_crowdsec_lapi_key }}"
+      - "traefik.http.middlewares.crowdsec.plugin.bouncer.crowdseclapischeme=http"
+      - "traefik.http.middlewares.crowdsec.plugin.bouncer.crowdseclapihost={{ traefik_crowdsec_lapi_host }}:8080"
+      - "traefik.http.middlewares.crowdsec.plugin.bouncer.loglevel=DEBUG"
+
+      - "traefik.http.middlewares.crowdsec.plugin.bouncer.crowdsecappsecenabled=true"
+      - "traefik.http.middlewares.crowdsec.plugin.bouncer.crowdsecappsechost={{ traefik_crowdsec_lapi_host }}:7422"
+
+      - "traefik.http.middlewares.crowdsec.plugin.bouncer.logLevel=DEBUG"
+      - "traefik.http.middlewares.crowdsec.plugin.bouncer.logFilePath=/var/log/traefik/traefikbouncer.log"
+{% endif %}
+    networks:
+      - default
+
+
+secrets:
+  acme_email:
+    file: /opt/p2-network/traefik/acme_email

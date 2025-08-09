@@ -32,7 +32,7 @@
 
 - name: Write traefik/docker-compose.yml
   ansible.builtin.template:
-    src: templates/traefik/docker-compose.yml
+    src: templates/traefik/{{ traefik_docker_compose_file }}
     dest: /opt/p2-network/traefik/docker-compose.yml
 
 - name: Write traefik-acme/acme_email
