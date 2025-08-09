@@ -22,6 +22,7 @@ services:
   docker-in-docker:
     image: code.forgejo.org/oci/docker:dind
     hostname: docker  # Must set hostname as TLS certificates are only valid for docker or localhost
+    restart: unless-stopped
     privileged: true
     environment:
       DOCKER_TLS_CERTDIR: /certs
@@ -77,6 +78,7 @@ services:
 
   runner-daemon:
     image: code.forgejo.org/forgejo/runner:{{ forgejo_runner_version }}
+    restart: unless-stopped
     links:
       - docker-in-docker
     environment:
