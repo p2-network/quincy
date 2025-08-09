@@ -399,6 +399,10 @@
       include_tasks: tasks/forgejo-runner.yml
       when: wants_forgejo_runner is true
 
+    - name: Deploy forgejo-runner-compose
+      include_tasks: tasks/forgejo-runner-compose.yml
+      when: wants_forgejo_runner_compose is true
+
     - name: Deploy Traefik
       include_tasks: tasks/traefik.yml
       when: traefik_acme_email is defined
