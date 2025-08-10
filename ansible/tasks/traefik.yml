@@ -28,7 +28,11 @@
   ansible.builtin.template:
     src: templates/traefik/tls.yml
     dest: /opt/p2-network/traefik/traefik/tls.yml
-  # TODO: add a handler to restart traefik
+
+- name: Write traefik/serverTransports.yml
+  ansible.builtin.template:
+    src: templates/traefik/serverTransports.yml
+    dest: /opt/p2-network/traefik/traefik/serverTransports.yml
 
 - name: Write traefik/docker-compose.yml
   ansible.builtin.template:

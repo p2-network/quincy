@@ -1,0 +1,27 @@
+services:
+
+# docker pull kanidm/radius:latest
+# docker pull kanidm/tools:latest
+
+  server:
+    image: kanidm/server:1.7.1
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.kanidm-server.rule=Host(`login.thepatrick.cloud`)'
+      - 'traefik.http.routers.kanidm-server.entrypoints=websecure'
+      - 'traefik.http.routers.kanidm-server.tls=true'
+      - 'traefik.http.routers.kanidm-server.tls.certresolver=route53'      
+      - 'traefik.http.services.kanidm-server.loadbalancer.server.port=8443'
+      - 'traefik.http.services.kanidm-server.loadbalancer.server.scheme=https'
+      - "traefik.http.services.kanidm-server.loadbalancer.serverstransport=skipVerify@file"
+    networks:
+      default:
+      traefik:
+    restart: unless-stopped
+    volumes:
+      - ./data:/data
+
+networks:
+  traefik:
+    name: traefik_default
+    external: true

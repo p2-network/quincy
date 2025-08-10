@@ -402,6 +402,10 @@
     - name: Deploy Traefik
       include_tasks: tasks/traefik.yml
       when: traefik_acme_email is defined
+    
+    - name: Deploy Kanidm
+      include_tasks: tasks/kanidm.yml
+      when: wants_kanidm is true
 
     - name: Deploy Seafile
       include_tasks: tasks/seafile.yml
