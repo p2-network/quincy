@@ -4,7 +4,7 @@ services:
 # docker pull kanidm/tools:latest
 
   server:
-    image: kanidm/server:1.7.1
+    image: kanidm/server:1.7.3
     labels:
       - 'traefik.enable=true'
       - 'traefik.http.routers.kanidm-server.rule=Host(`login.thepatrick.cloud`)'
