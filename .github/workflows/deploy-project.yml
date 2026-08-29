@@ -12,12 +12,12 @@ jobs:
     if: github.event_name != 'pull_request'
     steps:
       - name: checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
       - name: Tailscale
-        uses: tailscale/github-action@v3
+        uses: tailscale/github-action@v4
         with:
           oauth-client-id: ${{ secrets.TAILSCALE_CI_CLIENT_ID }}
           oauth-secret: ${{ secrets.TAILSCALE_CI_CLIENT_SECRET }}
@@ -39,7 +39,7 @@ jobs:
           pipx inject ansible-core netaddr
 
       - name: Run playbook
-        uses: dawidd6/action-ansible-playbook@v2
+        uses: dawidd6/action-ansible-playbook@v9
         with:
           playbook: main.yml
           directory: ./ansible
